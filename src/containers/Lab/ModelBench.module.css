@@ -1,33 +1,33 @@
 .ModelBenchContainer {
   display: flex;
   background-color: rgb(240, 240, 240);
-  width: 99vw;
-  height: 90vh;
-  /*background-color: aqua;*/
+  height: 91vh;
+  justify-content: flex-end;  /*background-color: aqua;*/
+  margin-left: auto;
+  /* overflow: hidden; */
+
 }
 .ModelBenchItemLeft {
-  width: 10%;
-  padding-top: 1%;
-
+  flex: 1 1 auto;
 
   /*background-color: blue;
   border-width: 5px;
   border-color: red;
   border-style: solid;*/
 }
+/*  */
 
-.ModelBenchItemLeftEqnNav {
-  padding-top: 5%;
 
-}
-.ModelBenchItemLeftFileNav {
-
-  /* border-color: blue;
-  background-color: blueviolet;*/
-  width: auto;
-}
 .ModelBenchItemCenter {
-  flex-grow: 1;
+  flex: 70 1 auto;
+  /* overflow: hidden; */
 
   /*background-color: brown;*/
+}
+
+.copyright{
+  font-size:10px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
 }

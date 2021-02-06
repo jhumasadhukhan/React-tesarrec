@@ -1,43 +1,87 @@
 .Container {
-  /*
-  background-color: blanchedalmond;
-  border-width: 2px;
-  border-color: rgb(156, 122, 12);
-  border-style: solid;
-  */
   display: flex;
+  width: 100%;
+
+  align-content: center;
+  justify-content: space-between;
+  flex-flow: row wrap;
+  /* overflow: hidden; */
+}
+.EqnColumn {
+  flex: 5 ;
+  width: 0;
+  order: 2;
+}
+.EqnContainer {
+  overflow: auto;
+}
+
+.MetaContainer {
+  margin-top: 10px;
+}
+.PicContainer{
+
+  margin-top: 10px;
+
+}
+.VarColumn {
+  flex: 3 ;
+  width: 0;
+
+  order: 4;
+
+  /* flex-flow: column wrap; */
+  margin-left: 10px;
+
+  /* justify-content: flex-start;
+  align-content: flex-start; NEW */
 }
 
 .VarContainer {
-  display: flex;
-  flex-direction: column;
-  width: 80%;
+  background-color: aquamarine;
 }
-
-.EqnContainer {
-  width: 30%;
-  display: flex;
-  flex-direction: column;
-  width: 80%;
-
-  /*
-  border-width: 2px;
-  border-color: rgb(56, 122, 122);
-  border-style: solid;
-  */
+.ConsoleContainer {
+  font-family: "VT323", monospace;
+  font-size: small;
+  color: rgb(12, 221, 12);
+  background-color: black;
 }
 
 .Graph {
-  float: right;
-  width: 43%;
-  /*
-  background-color: bisque; 
+  flex: 8 0;
+  width: 0;
+
+  /* margin: 10px; */
+  order: 5;
+  /* margin: 5px; */
+
+  /* background-color: bisque; 
   border-width: 2px;
   border-color: rgb(21, 8, 99);
-  border-style: solid;
-  */
+  border-style: solid; */
 }
 
 .graphConfig {
-  background-color: aquamarine;
+  width: 25%;
+  position: absolute;
+  top: 30%;
+  left: 25%;
+  /* display: flex;
+  justify-content: center;
+  align-items: center; */
+  margin: 0 auto;
 }
+.loadingText{
+  color: rgb(83, 81, 68);
+
+}
+/* .textfield{
+  background-color: aqua;
+  float: left;
+
+}
+.uploadButton{
+  background-color: red;
+  float: left;
+
+} */

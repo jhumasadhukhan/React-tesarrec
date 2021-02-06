@@ -2,8 +2,6 @@ import React from "react";
 import HeatMap from "react-heatmap-grid";
 
 //const consoleLogger = (background, value, min, max, data, x, y) => {
- // console.log(background, value, min, max, data, x, y);
-  //console.log(1 - (max - value) / (max - min))
 
  // return null;
 //};
@@ -40,12 +38,13 @@ const MyHeatMap = (props) => {
         cellStyle={(background, value, min, max, data, x, y) => ({
       
           background: `${props.color}, ${1 - (max - value) / (max - min)})`,
-          fontSize: "12px",
+          fontSize: "14px",
         })}
+
         
         //onClick={(x, y,value) => alert(`Clicked ${x}, ${y}, ${value}`)}
 
-        onClick={(x, y) => props.HeatMapChangedOnClick({ x }, { y }, data)}
+        onClick={(x, y) => props.HeatMapChangedOnClick( x ,  y ,data[y][x])}
         cellRender={(value) => value && `${value}`}
         title={(value) => ` ${value}`}
       />

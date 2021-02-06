@@ -35,14 +35,14 @@ class HeatMapForm extends Component {
     Volume: 10,
     efficiencyValue: 1,
 
-    CCGT: 100,
+    CCGT: 0,
     Nuclear: 100,
     Biomass: 100,
-    Coal: 100,
+    Coal: 0,
     Wind: 100,
     Solar: 100,
-    Oil: 100,
-    OCGT: 100,
+    Oil: 0,
+    OCGT: 0,
     Hydroelectric: 100,
     PumpedHydro: 100,
     Other: 100,
@@ -63,21 +63,20 @@ class HeatMapForm extends Component {
 
   HeatMapChangedOnClick = (x, y, value) => {
     this.setState({
-      xCoordAnode: x.x,
-      yCoordCathode: y.y,
-      AnodeSubstrateChemical: this.state.HeatMapState.xLabels[x.x],
-      CathodeProductChemical: this.state.HeatMapState.yLabels[y.y],
-      chosenValue: value[y.y][x.x],
+      xCoordAnode: x,
+      yCoordCathode: y,
+      AnodeSubstrateChemical: this.state.HeatMapState.xLabels[x],
+      CathodeProductChemical: this.state.HeatMapState.yLabels[y],
+      chosenValue: value,
     });
   };
 
-  SliderhandleChange = (name) => ( event,value) => {
+  SliderhandleChange = (name) => (event, value) => {
     this.setState({ [name]: value });
   };
 
   InputhandleChange = (name) => (event) => {
-    let { value,  max } = event.target;
-
+    let { value, max } = event.target;
 
     if (+value > +max) {
       value = max;
@@ -88,42 +87,10 @@ class HeatMapForm extends Component {
 
   render() {
     return (
-      <div>
-        <RightContent
-          AnodeSubstrateChemical={this.state.AnodeSubstrateChemical}
-          CathodeProductChemical={this.state.CathodeProductChemical}
-          chosenValue={this.state.chosenValue}
-          AnodeSubstrateConcentration={this.state.AnodeSubstrateConcentration}
-          Volume={this.state.Volume}
-          efficiencyValue={this.state.efficiencyValue}
-          SliderhandleChange={(val) => this.SliderhandleChange(val)}
-          InputhandleChange={(val) => this.InputhandleChange(val)}
-          CCGT={this.state.CCGT}
-          Nuclear={this.state.Nuclear}
-          Biomass={this.state.Biomass}
-          Coal={this.state.Coal}
-          Wind={this.state.Wind}
-          Solar={this.state.Solar}
-          Oil={this.state.Oil}
-          OCGT={this.state.OCGT}
-          Hydroelectric={this.state.Hydroelectric}
-          PumpedHydro={this.state.PumpedHydro}
-          Other={this.state.Other}
-          MES={true}
-          AnodeCost={this.state.AnodeCost}
-          CathodeCost={this.state.CathodeCost}
-          MembraneCost={this.state.MembraneCost}
-          CurrentCollectorCost={this.state.CurrentCollectorCost}
-          AnolyteCost={this.state.AnolyteCost}
-          CatholyteCost={this.state.CatholyteCost}
-          ExternalEnergyCost={this.state.ExternalEnergyCost}
-          LangFactorCost={this.state.LangFactorCost}
-          ACCCost={this.state.ACCCost}
-          ProductionPriceCost={this.state.ProductionPriceCost}
-          IRRCost={this.state.IRRCost}
-        />
+      <div className={classes.Container}>
+    
 
-        <div className={classes.HeatMap}>
+        <div className={classes.HeatMaps}>
           <OverallReactionAnodeCathode
             cathodeProduct={this.state.CathodeProductChemical}
             anodeSubstrate={this.state.AnodeSubstrateChemical}
@@ -156,6 +123,41 @@ class HeatMapForm extends Component {
             IRRCost={this.state.IRRCost}
             xCoordAnode={this.state.xCoordAnode}
             yCoordCathode={this.state.yCoordCathode}
+          />
+        </div>
+        <div className={classes.RightContent}>
+          <RightContent
+            AnodeSubstrateChemical={this.state.AnodeSubstrateChemical}
+            CathodeProductChemical={this.state.CathodeProductChemical}
+            chosenValue={this.state.chosenValue}
+            AnodeSubstrateConcentration={this.state.AnodeSubstrateConcentration}
+            Volume={this.state.Volume}
+            efficiencyValue={this.state.efficiencyValue}
+            SliderhandleChange={(val) => this.SliderhandleChange(val)}
+            InputhandleChange={(val) => this.InputhandleChange(val)}
+            CCGT={this.state.CCGT}
+            Nuclear={this.state.Nuclear}
+            Biomass={this.state.Biomass}
+            Coal={this.state.Coal}
+            Wind={this.state.Wind}
+            Solar={this.state.Solar}
+            Oil={this.state.Oil}
+            OCGT={this.state.OCGT}
+            Hydroelectric={this.state.Hydroelectric}
+            PumpedHydro={this.state.PumpedHydro}
+            Other={this.state.Other}
+            MES={true}
+            AnodeCost={this.state.AnodeCost}
+            CathodeCost={this.state.CathodeCost}
+            MembraneCost={this.state.MembraneCost}
+            CurrentCollectorCost={this.state.CurrentCollectorCost}
+            AnolyteCost={this.state.AnolyteCost}
+            CatholyteCost={this.state.CatholyteCost}
+            ExternalEnergyCost={this.state.ExternalEnergyCost}
+            LangFactorCost={this.state.LangFactorCost}
+            ACCCost={this.state.ACCCost}
+            ProductionPriceCost={this.state.ProductionPriceCost}
+            IRRCost={this.state.IRRCost}
           />
         </div>
       </div>

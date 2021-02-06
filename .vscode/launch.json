@@ -1,0 +1,54 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {"name":"Python: Flask","type":"python","request":"launch","module":"flask","env":{"FLASK_APP":"app.py","FLASK_ENV":"development","FLASK_DEBUG":"0"},"args":["run","--no-debugger","--no-reload"],"jinja":true},
+      {
+        "name": "Launch Chrome",
+        "request": "launch",
+        "type": "pwa-chrome",
+        "url": "http://localhost:3000",
+        "webRoot": "${workspaceFolder}"
+      },
+   
+      {
+        "name": "Debug Tests Single Run",
+        "type": "node",
+        "request": "launch",
+        "env": { "CI": "true" },
+        "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/react-scripts",
+        "args": ["test", "--runInBand", "--no-cache"],
+        "cwd": "${workspaceRoot}",
+        "protocol": "inspector",
+        "console": "integratedTerminal",
+        "internalConsoleOptions": "neverOpen"
+      },
+      {
+        "name": "Debug tests watch mode",
+        "type": "node",
+        "request": "launch",
+        "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/react-scripts",
+        "args": ["test", "--runInBand", "--no-cache", "--watchAll"],
+        "cwd": "${workspaceRoot}",
+        "protocol": "inspector",
+        "console": "integratedTerminal",
+        "internalConsoleOptions": "neverOpen"
+      },
+      {
+        "name": "Debug tests opened file",
+        "type": "node",
+        "request": "launch",
+        "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/react-scripts",
+        "args": [
+          "test",
+          "${fileBasenameNoExtension}",
+          "--runInBand",
+          "--no-cache",
+          "--watchAll"
+        ],
+        "cwd": "${workspaceRoot}",
+        "protocol": "inspector",
+        "console": "integratedTerminal",
+        "internalConsoleOptions": "neverOpen"
+      }
+    ]
+  }

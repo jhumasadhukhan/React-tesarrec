@@ -2,11 +2,15 @@ import React from "react";
 import MyChart from "../../../UI/Canvas/LineChart";
 import DiffEquationSolver from "./DiffEquationSolver";
 
+/**
+ * This class solves Single ODEs and plots them
+ * @param props
+ * @returns {*}
+ * @constructor
+ */
 const DiffEquationGrapher = (props) => {
 
   let solver = DiffEquationSolver(props)
- 
-  
 
   const ShowGraph = (Euler, Midpoint, RungeKutta) => {
     return (
@@ -14,9 +18,8 @@ const DiffEquationGrapher = (props) => {
         <div>
           <MyChart
             LineNames={props.LineNames}
-            EulerData={Euler}
-            MidpointData={Midpoint}
-            RungeKuttaData={RungeKutta}
+            dataPoints={[Euler,Midpoint,RungeKutta]}
+     
             eqn={props.eqn}
             axisNames={["x", "y"]}
             horizontalAlign={props.LegendHorizontal}

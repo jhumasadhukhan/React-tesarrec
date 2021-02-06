@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 
-import LeftContent from "../LeftContent/LeftContent";
 import RightContent from "../RightContent/RightContent";
 import classes from "./HeatMapFormMFC.module.css";
 import OverallReactionAnodeCathode from "../../../../../components/Calculations/Sustainability/MFC/OverallReactionAnodeCathodeHeatMapMFC";
@@ -37,14 +36,14 @@ class HeatMapFormMFC extends Component {
     Volume: 10,
     efficiencyValue: 1,
 
-    CCGT: 100,
+    CCGT: 0,
     Nuclear: 100,
     Biomass: 100,
-    Coal: 100,
+    Coal: 0,
     Wind: 100,
     Solar: 100,
-    Oil: 100,
-    OCGT: 100,
+    Oil: 0,
+    OCGT: 0,
     Hydroelectric: 100,
     PumpedHydro: 100,
     Other: 100,
@@ -59,15 +58,23 @@ class HeatMapFormMFC extends Component {
     AnolyteCost: 0.0012,
     CatholyteCost: 0.5,
     ElectricityPriceCost: 0.15,
+
+    ProportionImportDenmark:0.000473,
+    ProportionImportIreland:0.061649,
+    ProportionImportBelgium:0.203841,
+    ProportionImportNetherlands:0.24222,
+    ProportionImportFrance:0.491818,
+
+
   };
 
   HeatMapChangedOnClick = (x, y, value) => {
     this.setState({
-      xCoordAnode:x.x,
-      yCoordCathode:y.y,
-      AnodeSubstrateChemical: this.state.HeatMapState.xLabels[x.x],
-      CathodeProductChemical: this.state.HeatMapState.yLabels[y.y],
-      chosenValue: value[y.y][x.x],
+      xCoordAnode: x,
+      yCoordCathode: y,
+      AnodeSubstrateChemical: this.state.HeatMapState.xLabels[x],
+      CathodeProductChemical: this.state.HeatMapState.yLabels[y],
+      chosenValue: value,
     });
   };
 
@@ -87,8 +94,9 @@ class HeatMapFormMFC extends Component {
 
   render() {
     return (
-      <div>
-        <LeftContent />
+      <div className={classes.Container}>
+
+        <div className={classes.RightContent}>
 
         <RightContent
           AnodeSubstrateChemical={this.state.AnodeSubstrateChemical}
@@ -118,9 +126,17 @@ class HeatMapFormMFC extends Component {
           ElectricityPriceCost={this.state.ElectricityPriceCost}
           AnnualCapitalChargeCost={this.state.AnnualCapitalChargeCost}
           IRRCost={this.state.IRRCost}
-        />
+          ProportionImportDenmark={this.state.ProportionImportDenmark}
+          ProportionImportIreland={this.state.ProportionImportIreland}
+          ProportionImportBelgium={this.state.ProportionImportBelgium}
+          ProportionImportNetherlands={this.state.ProportionImportNetherlands}
+          ProportionImportFrance={this.state.ProportionImportFrance}
 
-        <div className={classes.HeatMap}>
+        />
+        </div>
+       
+
+        <div className={classes.HeatMaps}>
           <OverallReactionAnodeCathode
             cathodeProduct={this.state.CathodeProductChemical}
             anodeSubstrate={this.state.AnodeSubstrateChemical}
@@ -150,6 +166,11 @@ class HeatMapFormMFC extends Component {
             IRRCost={this.state.IRRCost}
             xCoordAnode={this.state.xCoordAnode}
             yCoordCathode={this.state.yCoordCathode}
+            ProportionImportDenmark={this.state.ProportionImportDenmark}
+            ProportionImportIreland={this.state.ProportionImportIreland}
+            ProportionImportBelgium={this.state.ProportionImportBelgium}
+            ProportionImportNetherlands={this.state.ProportionImportNetherlands}
+            ProportionImportFrance={this.state.ProportionImportFrance}
             
           />
         </div>

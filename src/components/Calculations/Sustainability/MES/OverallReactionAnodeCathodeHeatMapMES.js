@@ -11,8 +11,6 @@ import { abs } from "mathjs";
 import MESPic from "../../../../assets/MES.png";
 import CashFlowGraph from "./CashFlowGraph";
 const OverallReactionAnodeCathode = (props) => {
-  //console.log(props.anodeSubstrate)
-  //console.log(props.cathodeProduct)
 
   let CarbonEmmision =
     (props.CCGT * 0.1386 +
@@ -48,7 +46,6 @@ const OverallReactionAnodeCathode = (props) => {
   props.heatMapContents.yLabels.forEach((Yelement) => {
     props.heatMapContents.xLabels.forEach((Xelement) => {
       let AnodeData = ReadAnodeJSON(Xelement);
-      //console.log(AnodeData)
       let x = parseInt(AnodeData.value.x);
       let y = parseInt(AnodeData.value.y);
       let z = parseInt(AnodeData.value.z);
@@ -57,7 +54,6 @@ const OverallReactionAnodeCathode = (props) => {
       );
 
       let CathodeData = ReadCathodeJSON(Yelement);
-      //console.log(CathodeData)
       let c = parseInt(CathodeData.value.c); //n_c
       let h = parseInt(CathodeData.value.h);
       let o = parseInt(CathodeData.value.o);
@@ -144,7 +140,7 @@ const OverallReactionAnodeCathode = (props) => {
             2.43 *
             parseFloat(StandardGibbsEnergyOfReactionkJ));
       
-      let MinimumProductSellingPrice=((CapitalCost*props.ACCCost)+Opex)/ProductionRateg*24*365/1000
+      let MinimumProductSellingPrice=((CapitalCost*props.ACCCost)+Opex)/(ProductionRateg*24*365/1000)
 
       ProductionRategData.push(ProductionRateg.toFixed(2));
 
@@ -189,30 +185,14 @@ const OverallReactionAnodeCathode = (props) => {
 
   let TwoDMinimumProductSellingPriceData=FormatArr(MinimumProductSellingPriceData)
 
-  // console.log(
-  //   TwoDCapitalCostData,
-  //   props.ProductionPriceCost,
-  //   TwoDProductionRategData,
-  //   props.ACCCost,
-  //   props.LangFactorCost,
-  //   props.AnolyteCost,
-  //   props.CatholyteCost,
-  //   props.ExternalEnergyCost,
-  //   TwoDGibbsEnergyData,
-  //   props.IRRCost,
-  //   props.chosenValue,
-  //   props.anodeSubstrate,
-  //   props.cathodeProduct,
-  //   props.xCoordAnode,
-  //   props.yCoordCathode
-  // );
+  
   return (
     <div className={classes.HeatMaps}>
       <div className={classes.HeatMapEnergyPerformance}>
         <img src={MESPic} width="110%" alt="mes pic"></img>
       </div>
       <div className={classes.HeatMapEnergyPerformance}>
-        <h3>Heat map of Theoretical potential (V)</h3>
+        <h3>Heat map of Theoretical potential (-V)</h3>
 
         <MyHeatMap
           xLabels={props.heatMapContents.xLabels}
@@ -229,7 +209,7 @@ const OverallReactionAnodeCathode = (props) => {
           xLabels={props.heatMapContents.xLabels}
           yLabels={props.heatMapContents.yLabels}
           data={TwoDProductionRategData}
-          color={"rgba(117, 224, 214"}
+          color={"rgba(180, 100, 100"}
           HeatMapChangedOnClick={props.HeatMapChangedOnClick}
         />
       </div>
@@ -240,7 +220,7 @@ const OverallReactionAnodeCathode = (props) => {
         <MyHeatMap
           xLabels={props.heatMapContents.xLabels}
           yLabels={props.heatMapContents.yLabels}
-          color={"rgba(4, 115, 180"}
+          color={"rgba(160, 100, 100"}
           data={TwoDGWPSavingyData}
           HeatMapChangedOnClick={props.HeatMapChangedOnClick}
         />
@@ -252,7 +232,7 @@ const OverallReactionAnodeCathode = (props) => {
         <MyHeatMap
           xLabels={props.heatMapContents.xLabels}
           yLabels={props.heatMapContents.yLabels}
-          color={"rgba(126, 176, 242"}
+          color={"rgba(140, 100, 100"}
           data={TwoDCapitalCostData}
           HeatMapChangedOnClick={props.HeatMapChangedOnClick}
         />
@@ -264,7 +244,7 @@ const OverallReactionAnodeCathode = (props) => {
         <MyHeatMap
           xLabels={props.heatMapContents.xLabels}
           yLabels={props.heatMapContents.yLabels}
-          color={"rgba(138, 235, 79"}
+          color={"rgba(120, 100, 100"}
           data={TwoDOpexData}
           HeatMapChangedOnClick={props.HeatMapChangedOnClick}
         />
@@ -276,7 +256,7 @@ const OverallReactionAnodeCathode = (props) => {
         <MyHeatMap
           xLabels={props.heatMapContents.xLabels}
           yLabels={props.heatMapContents.yLabels}
-          color={"rgba(23, 92, 132"}
+          color={"rgba(100, 100, 100"}
           data={TwoDProductValueData}
           HeatMapChangedOnClick={props.HeatMapChangedOnClick}
         />
@@ -288,13 +268,15 @@ const OverallReactionAnodeCathode = (props) => {
         <MyHeatMap
           xLabels={props.heatMapContents.xLabels}
           yLabels={props.heatMapContents.yLabels}
-          color={"rgba(23, 23, 79"}
+          color={"rgba(200, 120, 100"}
           data={TwoDMinimumProductSellingPriceData}
           HeatMapChangedOnClick={props.HeatMapChangedOnClick}
         />
       </div>
 
       <div className={classes.HeatMapEnergyPerformance}>
+      <h3>Discounted cash flow analysis</h3>
+
         <CashFlowGraph
           TwoDCapitalCostData={TwoDCapitalCostData}
           ProductionPriceCost={props.ProductionPriceCost}

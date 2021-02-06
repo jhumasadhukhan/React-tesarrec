@@ -1,0 +1,11 @@
+{
+  "vars": [{}],
+  "eqns": ["sin(log(t))"],
+  "solved": ["-(1/2)*t*(cos(log(t)) - sin(log(t)))"],
+  "t0": 0.1,
+  "h": 0.1,
+  "numOfCycles": 10,
+  "initialConditions": [0],
+  "lineNames":["a"]
+
+}
