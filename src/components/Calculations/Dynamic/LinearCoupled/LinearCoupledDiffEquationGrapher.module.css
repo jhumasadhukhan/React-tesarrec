@@ -1,0 +1,40 @@
+.Container{
+  display: flex;
+  flex-flow: column wrap;
+  background-color: green;
+  height: 100%;  
+  margin-left: 10px;
+
+
+
+}
+
+.Table{
+  /* margin:5px; */
+  flex: 1 ;
+  background-color: aqua;
+  overflow-x: auto;
+
+  width: 100%;
+  height: 40vh;  
+
+
+}
+
+.Graph{
+  /* margin:5px; */
+
+  flex: 1;
+  background-color: red;
+
+
+  /* width: 45vw; */
+
+ 
+}
+.Button{
+  background-color: aqua;
+  position: absolute;
+  top: 0;
+  left: 45vw;
+}

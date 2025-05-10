@@ -30,7 +30,7 @@ describe("<LinearCoupledDiffEqns/>", () => {
           {
             id: "qwert",
             line: "a",
-            DByDLatex: "\\frac{da}{dt}=",
+            LHSLatexEqn: "\\frac{da}{dt}=",
             LatexEqn: "-\\frac{0.09ab}{0.103+a}-\\frac{0.84ac}{0.425+a}",
             TextEqn: "-(0.09*a*b)/(0.103+a)-(0.84*a*c)/(0.425+a)",
             errorMessage: null,
@@ -43,17 +43,14 @@ describe("<LinearCoupledDiffEqns/>", () => {
     const wrapper = shallow(comp);
 
     expect(wrapper.find(<EqnItem />));
-    console.log(wrapper.find('EqnItem').props());
     expect(wrapper.find("EqnItem").props().disabledRemoveButton).toEqual(false);
     expect(wrapper.find("EqnItem").props().error).toEqual(null);
     expect(wrapper.find("EqnItem").props().id).toEqual("qwert");
 
 
     //expect(wrapper.find(<LineChart/>).type()).to.equal('LineChart');
-    //expect(wrapper.props().numberOfCycles).to.equal([ 'Euler', 'Midpoint', 'Runge Kutta' ]);
+    //expect(wrapper.props().numOfCycles).to.equal([ 'Euler', 'Midpoint', 'Runge Kutta' ]);
 
-    //console.log(wrapper.find('EulerData').debug({ verbose: true }));
-    //console.log(wrapper.debug({ verbose: true }));
     expect(wrapper).toMatchSnapshot();
   });
 });

@@ -4,12 +4,11 @@ import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import Slider from "@material-ui/core/Slider";
 import InputBase from "@material-ui/core/InputBase";
+import { Paper } from "@material-ui/core";
 
 const useStyles = makeStyles({
   root: {
     width: (props) => props.rootWidth,
-    float: "left",
-    margin: "5px",
   },
   input: {
     width: (props) => props.inputWidth,
@@ -18,7 +17,6 @@ const useStyles = makeStyles({
 
 const InputSlider = (props) => {
   const classes = useStyles(props);
-
   return (
     <div className={classes.root}>
       <Typography id="input-slider" gutterBottom>
@@ -37,14 +35,22 @@ const InputSlider = (props) => {
             max={props.highestVal}
             step={props.highestVal / 1000}
           />
+
+
         </Grid>
         <Grid item>
           <InputBase
-            style={{ color: "black" }}
             className={classes.input}
             value={props.value}
             margin="dense"
             onChange={props.InputhandleChange}
+            type= "number"
+          //   InputProps={{
+          //     inputProps: { 
+          //       min: props.lowestVal,
+          //       max: props.highestVal,
+          //     }
+          // }}
             inputProps={{
               step: props.highestVal / 100,
               min: props.lowestVal,

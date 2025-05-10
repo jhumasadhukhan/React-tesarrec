@@ -1,77 +1,69 @@
 import React, { Component } from "react";
-import CanvasJSReact from "../../../assets/canvasjs.react";
 //import classes from './Chart.module.css';
 //import FractionDisplay from '../../Math/Math'
-var CanvasJSChart = CanvasJSReact.CanvasJSChart;
+import {
+  LineChart,
+  Line,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  Label,
+} from "recharts";
 
-class LineChart extends Component {
+class MyLineChart extends Component {
   render() {
-    const options = {
-      animationEnabled: true,
-      exportEnabled: true,
-      theme: "light2", // "light1", "dark1", "dark2"
-
-      axisY: {
-        title: this.props.axisNames[1],
-      },
-      axisX: {
-        title: this.props.axisNames[0],
-      },
-      legend:{
-        verticalAlign:this.props.verticalAlign,
-        horizontalAlign:this.props.horizontalAlign
-      },
-      backgroundColor: "white",
-      zoomEnabled: true,
-      data: [
-        {
-          type: "line",
-          name: this.props.LineNames[0],
-          showInLegend: true,
-
-          toolTipContent: this.props.LineNames[0]+ ": {x}, {y}",
-          dataPoints: this.props.EulerData,
-          markerType: "none",
-        },
-        {
-          type: "line",
-          name: this.props.LineNames[1],
-          showInLegend: true,
-
-          toolTipContent: this.props.LineNames[1]+ ": {x}, {y}",
-          dataPoints: this.props.MidpointData,
-          markerType: "none",
-        },
-        {
-          type: "line",
-          name: this.props.LineNames[2],
-          showInLegend: true,
-
-          toolTipContent: this.props.LineNames[2]+ ": {x}, {y}",
-          dataPoints: this.props.RungeKuttaData,
-          markerType: "none",
-        },
-        {
-          type: "line",
-          name: this.props.LineNames[3],
-          showInLegend: true,
-
-          toolTipContent:this.props.LineNames[3]+ ":  {x}, {y}",
-          dataPoints: this.props.Line4Data,
-          markerType: "none",
-        },
-      ],
-    };
     return (
-      <div style={{ width: "100%" }}>
-        <CanvasJSChart
-          options={options}
-          /* onRef={ref => this.chart = ref} */
-        />
-        {/*You can get reference to the chart instance as shown above using onRef. This allows you to access all chart properties and methods*/}
+      <div
+        style={{ position: "relative", width: "100%", paddingBottom: "300px" }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            bottom: 0,
+            top: 0,
+          }}
+        >
+          <ResponsiveContainer>
+            <LineChart
+              data={this.props.dataPoints[0]}
+              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                dataKey="x"
+                label={{
+                  value: this.props.axisNames[0],
+                  position: "left",
+                }}
+              />
+
+              <YAxis>
+                <Label
+                  value={this.props.axisNames[1]}
+                  angle="-90"
+                  position="insideBottomLeft"
+                />
+              </YAxis>
+              <Tooltip />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="y"
+                stroke="#8884d8"
+                legendType="none"
+              />
+              {/* <Line type="monotone" dataKey="y" stroke="#82ca9d" /> */}
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     );
   }
 }
 
-export default LineChart;
+export default MyLineChart;

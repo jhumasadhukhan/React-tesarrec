@@ -22,7 +22,6 @@ const CashFlowGraph = (props) => {
   for (let t = 1; t < 15; t++) {
     dataArr[t] = dataArr[t - 1] + k / (1 + props.IRRCost) ** t;
   }
-  // console.log(dataArr);
 
   let data = [
     { x: -3, y: 0 },
@@ -36,15 +35,14 @@ const CashFlowGraph = (props) => {
       y: parseFloat(dataArr[l].toFixed(2)),
     });
   }
-  console.log(data)
   return (
     <div>
       <MyChart
-        axisNames={["Year", "Discounted cash flow (€)"]}
+        axisNames={["Year", "Discounted cash flow ( million €)"]}
         verticalAlign={"top"}
         horizontalAlign={"center"}
         LineNames={["Discounted cash flow analysis"]}
-        EulerData={data}
+        dataPoints={[data]}
       />
     </div>
   );

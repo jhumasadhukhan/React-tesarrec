@@ -1,79 +1,16 @@
 import React from "react";
 import MyChart from "../../../UI/Canvas/LineChart";
-import { CSVLink } from "react-csv";
 
-import { Tooltip, IconButton } from "@material-ui/core";
-import ImportExportIcon from "@material-ui/icons/ImportExport";
-import LinearCoupledDiffEquationSolver from "./LinearCoupledDiffEquationSolver";
+import { Paper } from "@material-ui/core";
 
+import Table from "../../../UI/Table/Table";
+import classes from "./LinearCoupledDiffEquationGrapher.module.css";
 //DyByDx= x+3y
 
 const LinearCoupledDiffEquationGrapher = (props) => {
   /**
    * A method component that takes in a equation and outputs a chart
    */
-
-  
-
-  const ShowLinearCoupledGraph = (EqnArr) => {
-    let axis = props.axis; //x,y
-
-    let allData = [];
-    for (let index = 0; index < props.LineNames.length; index++) {
-      let yData = [];
-      EqnArr[index].forEach((coord) => {
-        yData.push(coord.y);
-      });
-      allData.push(yData);
-    }
-    let tData = [];
-    EqnArr[0].forEach((coord) => {
-      tData.push(coord.x);
-    });
-    allData.push(tData);
-    let xCoord = [];
-    let yCoord = [];
-    if (axis[0] === "t") {
-      xCoord = allData[allData.length - 1]; //t coord
-      yCoord = allData[props.LineNames.indexOf(axis[1])];
-    } else if (axis[1] === "t") {
-      xCoord = allData[props.LineNames.indexOf(axis[0])];
-      yCoord = allData[allData.length - 1]; //t coord
-    } else if (axis[0] === "t" && axis[1] === "t") {
-      //fix this
-      xCoord = allData[allData.length - 1]; //t coord
-      yCoord = allData[allData.length - 1]; //t coord
-    } else {
-      xCoord = allData[props.LineNames.indexOf(axis[0])];
-      yCoord = allData[props.LineNames.indexOf(axis[1])];
-    }
-    let csvData = [["x", "y"]];
-    for (let i = 0; i < xCoord.length; i++) {
-      csvData.push([xCoord[i], yCoord[i]]);
-    }
-
-    return (
-      <div>
-        <CSVLink data={csvData}>
-          <Tooltip title="Download model" placement="top">
-            <span>
-              <IconButton edge="end" aria-label="Download">
-                <ImportExportIcon />
-              </IconButton>
-            </span>
-          </Tooltip>
-        </CSVLink>
-
-        <MyChart
-          EulerData={FormatTwoArraysIntoCoordObject(xCoord, yCoord)}
-          LineNames={axis[1]}
-          axisNames={axis}
-          horizontalAlign={props.LegendHorizontal}
-          verticalAlign={props.LegendVertical}
-        />
-      </div>
-    );
-  };
 
   const FormatTwoArraysIntoCoordObject = (arr1, arr2) => {
     let returnedArr = [];
@@ -88,29 +25,65 @@ const LinearCoupledDiffEquationGrapher = (props) => {
     return returnedArr;
   };
 
-  const FormatArrayLinearCoupled = (arr) => {
-    let returnedArr = [];
-    for (let j = 0; j < props.LineNames.length; j++) {
-      let EqnArr = [];
-      for (let i = 0; i < arr.length; i++) {
-        const element = arr[i];
-        EqnArr.push({
-          x: parseFloat((i * props.h).toFixed(props.DecimalPrecision)),
-          y: parseFloat(element[j].toFixed(props.DecimalPrecision)),
-        });
-      }
-      returnedArr.push(EqnArr);
-    }
-    return returnedArr;
-  };
-
-  let computedResults = LinearCoupledDiffEquationSolver(props)
-
-  let EqnArr = FormatArrayLinearCoupled(
-    computedResults[0]
+  let newcomputedResults = props.modelObj.solutions.calcedSolution.map((row) =>
+    row.map((num) =>
+      parseFloat(num.toFixed(props.modelObj.Config.DecimalPrecision))
+    )
   );
 
-  return ShowLinearCoupledGraph(EqnArr);
+  // let newcomputedResults = props.computedResults.map((row) =>
+  //   row.map((num) =>
+  //     parseFloat(num.toFixed(props.modelObj.Config.DecimalPrecision))
+  //   )
+  // );
+
+
+  let objOfCoords = {};
+  let independentLatexForm = props.modelObj.Vars.find((el) => {
+    return el.VarType === "Independent";
+  }).LatexForm;
+  let lineNames = props.modelObj.Vars.filter(
+    (Var) => Var.VarType === "Dependent"
+  ).map((Var) => Var.LatexForm);
+
+  let order = [...lineNames, independentLatexForm];
+  for (let i = 0; i < newcomputedResults.length; i++) {
+    objOfCoords[order[i]] = newcomputedResults.map(function (value) {
+      return value[i];
+    });
+  }
+
+  let order3 = [];
+
+  for (let i = 0; i < newcomputedResults.length; i++) {
+    let order2 = {};
+
+    for (let j = 0; j < newcomputedResults[i].length; j++) {
+      order2[order[j]] = newcomputedResults[i][j];
+    }
+    order3.push(order2);
+  }
+
+  return (
+    <div className={classes.Container}>
+      <Paper elevation={3} className={classes.Graph}>
+        <MyChart
+          dataPoints={[
+            FormatTwoArraysIntoCoordObject(
+              objOfCoords[props.modelObj.Config.xAxis],
+              objOfCoords[props.modelObj.Config.yAxis]
+            ),
+          ]}
+          axisNames={[props.modelObj.Config.xAxis, props.modelObj.Config.yAxis]}
+        />
+      </Paper>
+
+      <Paper elevation={3} className={classes.Table}>
+        {/* <p>lore</p> */}
+        <Table rows={order3} columns={order} />
+      </Paper>
+    </div>
+  );
 };
 
 export default LinearCoupledDiffEquationGrapher;

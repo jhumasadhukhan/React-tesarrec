@@ -10,9 +10,9 @@ const Team = (props) => {
       <h1>Meet our Team</h1>
       <div className={classes.column}>
         <div className={classes.card}>
-          <img src={Jhuma} alt="Dr Jhuma Sadhukhan" style={{ width: "67%" }} />
+          <img src={Jhuma} alt="Prof Jhuma Sadhukhan" style={{ width: "67%" }} />
           <div className={classes.container}>
-            <h2>Dr Jhuma Sadhukhan</h2>
+            <h2>Prof Jhuma Sadhukhan</h2>
             <p className={classes.title}>Lead academic &amp; Founder</p>
             <a
               href="https://www.surrey.ac.uk/people/jhuma-sadhukhan"
@@ -22,7 +22,7 @@ const Team = (props) => {
               https://www.surrey.ac.uk/people/jhuma-sadhukhan
             </a>
             <p>
-              <button className={classes.button}>Contact</button>
+              {/* <button className={classes.button}>Contact</button> */}
             </p>
           </div>
         </div>
@@ -32,11 +32,11 @@ const Team = (props) => {
           <img
             src={Siddharth}
             alt="Dr Siddharth Gadkari"
-            style={{ width: "67%" }}
+            style={{ width: "66%" }}
           />
           <div className={classes.container}>
             <h2>Dr Siddharth Gadkari</h2>
-            <p className={classes.title}>NERC-UKRI Industrial Innovation Fellow</p>
+            <p className={classes.title}>Academic Co-Founder</p>
             <a
               href="https://www.surrey.ac.uk/people/siddharth-gadkari"
               target="_blank"
@@ -46,7 +46,7 @@ const Team = (props) => {
             </a>
 
             <p>
-              <button className={classes.button}>Contact</button>
+              {/* <button className={classes.button}>Contact</button> */}
             </p>
           </div>
         </div>
@@ -56,13 +56,13 @@ const Team = (props) => {
           <img src={Sohum} alt="Sohum Sen" style={{ width: "100%" }} />
           <div className={classes.container}>
             <h2>Sohum Sen</h2>
-            <p className={classes.title}>IT Analyst </p>
+            <p className={classes.title}>Software Engineer</p>
             <a href="https://github.com/sohumsen" target="_blank" rel="noopener noreferrer">
               https://github.com/sohumsen
             </a>
 
             <p>
-              <button className={classes.button}>Contact</button>
+              {/* <button className={classes.button}>Contact</button> */}
             </p>
           </div>
         </div>

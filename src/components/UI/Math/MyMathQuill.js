@@ -1,42 +1,26 @@
 import React from "react";
-import { addStyles, EditableMathField, StaticMathField } from "react-mathquill";
+import { addStyles, EditableMathField} from "react-mathquill";
 // inserts the required css to the <head> block.
 // You can skip this, if you want to do that by yourself.
 addStyles();
 
 const MyMathQuill = (props) => {
   return (
-    <div>
-      <StaticMathField>{props.firstBit}</StaticMathField>
-
+    <div style={{width:"100%"}}>
+      <EditableMathField
+        style={{ fontSize: "14px" }}
+        latex={props.firstBit}
+        // mathquillDidMount={(mathField) =>
+        // }
+        onChange={(mathField) => props.onLHSInputChange(mathField)}
+      />
+      {/* &nbsp;&nbsp;&nbsp; */}
       {!props.NoEdit ? (
         <EditableMathField
-          // config={{
-          //   substituteTextarea: function () {
-          //     console.log("substituteTextarea");
-          //     return document.createElement("textarea");
-          //   },
-          //   handlers: {
-          //     edit: (mathField) => console.log("edit"),
-          //     upOutOf: (mathField) => {
-          //       console.log("upOutOf");
-          //     },
-          //     selectOutOf: (direction,mathField) => {
-          //       console.log("selectOutOf");
-          //     },
-          //     moveOutOf: (mathField, dir, MQ) => {
-          //       console.log("moveOutOf");
-
-          //       if (dir === MQ.L) {
-          //         return null;
-          //       }
-          //     },
-          //   },
-          // }}
-          style={{ width: props.width }}
-          latex={props.latex} // Initial latex value for the input field
-          //mathquillDidMount={(mathField) => props.onDoubleClick(mathField)}
-          //onKeyDown={(mathField)=>{console.log(mathField)}}
+          style={props.style}
+          latex={props.secondBit} // Initial latex value for the input field
+          // mathquillDidMount={(mathField) =>
+          // }
           onChange={(mathField) => props.onInputChange(mathField)}
         />
       ) : null}

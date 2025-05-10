@@ -1,21 +1,32 @@
 .RemoveButton {
-  position: relative;
-  float: right;
-
+  flex: 1;
+  
+  
+}  
+.EqnText{
+ 
+  flex: 80;
+  /* background-color: aqua; */
 }
 
-
 .Container {
-  margin-bottom: 5%;
-  padding-left: 1%;
+
+  margin: 1%;
+  width: 100%;
+max-width: 100%;
+height: auto;
+  display: flex;
+  flex-flow: row nowrap;
+
 }
 
 .ErrorMsg {
+  flex: 1;
   color: red;
   font-size: smaller;
-  width: 30px;
+  /* width: 30px;
   float: right;
-  height: 30px;
+  height: 30px; */
 
 }
 

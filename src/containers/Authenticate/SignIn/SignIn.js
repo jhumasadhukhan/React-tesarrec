@@ -23,12 +23,11 @@ import CustomizedErrorMessage from "../../../components/UI/MyErrorMessage/Authen
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
-      {"Copyright © "}
-      <Link color="inherit" href="https://material-ui.com/">
-        Tesarrec™
-      </Link>
-      {new Date().getFullYear()}
-    </Typography>
+    {'Copyright ©'}
+    <Link color="inherit" href="https://tesarrec.web.app/">
+      Tesarrec
+    </Link>{' 2018 '}
+  </Typography>
   );
 }
 
@@ -68,6 +67,27 @@ class SignIn extends Component {
       password: this.state.password,
       returnSecureToken: true,
     };
+    // axios
+    //   .post(
+    //     "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" +
+    //       FIREBASE_KEY,
+    //     authData
+    //   )
+    //   .then((data) => {
+    //     const expirationDate = new Date(
+    //       new Date().getTime() + data.expiresIn * 1000
+    //     );
+    //     localStorage.setItem("token", data.idToken);
+    //     localStorage.setItem("expirationDate", expirationDate);
+    //     localStorage.setItem("userId", data.localId);
+    //     localStorage.setItem("refreshToken", data.refreshToken);
+
+    //     this.props.authSuccess(data.idToken, data.localId);
+    //     this.props.checkAuthTimeout(data.expiresIn);
+    //   })
+    //   .catch((err) => {
+    //     this.props.authFail(err);
+    //   });
 
     fetch(
       "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" +
@@ -91,7 +111,6 @@ class SignIn extends Component {
           localStorage.setItem("expirationDate", expirationDate);
           localStorage.setItem("userId", data.localId);
           localStorage.setItem("refreshToken", data.refreshToken);
-
 
           this.props.authSuccess(data.idToken, data.localId);
           this.props.checkAuthTimeout(data.expiresIn);
@@ -165,9 +184,7 @@ class SignIn extends Component {
             ) : null}
             <Grid container>
               <Grid item xs>
-                <Link href="#" variant="body2">
-                  Forgot password?
-                </Link>
+                <NavLink to="/forgotpassword">{" Forgot password?"}</NavLink>
               </Grid>
               <Grid item>
                 <NavLink to="/signup" variant="body2">

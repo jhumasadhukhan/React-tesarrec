@@ -1,14 +1,17 @@
 import React, { Component } from "react";
-import SingleODE from "./SingleODE/SingleODE";
 import LinearCoupled from "./LinearCoupled/LinearCoupled";
-import FileController from "../../components/UI/FileController/FileGenerator";
-import classes from "./ModelBench.module.css";
-import MyTabs from "../../components/UI/MyTabs/MyTabs";
-import Skeleton from "../../components/UI/Skeleton/Skeleton";
-import MyErrorMessage from "../../components/UI/MyErrorMessage/MyErrorMessage";
+import ModelExplorer from "../../components/UI/FileController/ModelExplorer";
+import PublishedDialog from "../../components/UI/PublishedDialog/PublishedDialog";
 
-import DEFAULTEQNS from "./DefaultStates/DefaultEqns";
-import DEFAULTVARS from "./DefaultStates/DefaultVars";
+import classes from "./ModelBench.module.css";
+import SolverAnalysis from "./SolverAnalysis/SolverAnalysis";
+import Model from "../../components/Calculations/Dynamic/SampleEquations/Model";
+import axios from "axios";
+import FullScreenWrapper from "../../components/UI/FullScreenWrapper/FullScreenWrapper";
+import SnackbarError from "../../components/UI/MyErrorMessage/SnackbarError";
+import { withSnackbar,SnackbarProvider } from "notistack";
+import Button from '@material-ui/core/Button';
+
 
 class ModelBench extends Component {
   /**
@@ -17,217 +20,159 @@ class ModelBench extends Component {
    *
    */
   state = {
-    allModelId: {},
+    allModelId: {} /* { modelID: modelObj ...} */,
     allPublicId: {},
 
     selectedModelId: "",
     selectedModel: "",
 
-    calculate: false,
     error: false,
-    tabChoiceValue: 1,
+    tabChoiceValue: 1 /* TODO This component doesnt need to know this */,
     loading: false,
+    seekChildUpdates: false,
+    published: false,
   };
 
   componentDidMount() {
     this.setState({ loading: true });
-    this.getPrivateModels();
-    this.getPublicModels();
+    this.MODEL_getPrivate();
+    this.MODEL_getPublic();
   }
 
-  createNewFile = () => {
-    let aNewModel = {
-      Eqns: DEFAULTEQNS,
-      Vars: DEFAULTVARS,
-      Name: "Untitled",
-      Description: "Please add Description",
-      ActualSolution: "",
-      SolutionTechnique: "RK4",
-    };
+  generalDBRequest = (payload, url, methodType, ifNoError) => {
+    axios({
+      method: methodType,
+      url: url,
+      data: payload,
+    })
+      .then(() => {
+        ifNoError();
+      })
+      .catch((err) => {
+        console.log(err);
 
-    this.setState(
-      {
-        selectedModel: aNewModel,
-      },
-      () => {
-        const payload = this.state.selectedModel;
-
-        fetch(
-          "https://tesarrec.firebaseio.com/eqns/" +
-            this.props.userId +
-            ".json?auth=" +
-            this.props.token,
-          {
-            method: "post",
-            headers: {
-              Accept: "application/json, text/plain, */*",
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-          }
-        )
-          .then((response) => response.json())
-          .then((data) => {
-            if (!data.error) {
-              this.setState(
-                { selectedModelId: data.name, error: false },
-                () => {
-                  this.getPrivateModels();
-                }
-              );
-            } else {
-              this.setState({ error: true });
-            }
-          })
-          .catch((error) => {
-            this.setState({ error: true });
-          });
-      }
-    );
+        // this.setState({error:true})
+      });
   };
 
-  sendToParent = (eqns, vars) => {
-    let selectedModel = { ...this.state.selectedModel };
-    selectedModel.Eqns = eqns;
-    selectedModel.Vars = vars;
-    this.setState({ selectedModel: selectedModel });
-  };
+  MODEL_createNew = () => {
+    let aNewModel = this.newModel().returnConstructorObj();
+    aNewModel.meta.name =
+      aNewModel.meta.name + Object.keys(this.state.allModelId).length;
 
-  saveEquation = () => {
-    const payload = this.state.selectedModel;
-
-    if (this.state.selectedModelId !== "") {
-      fetch(
+    axios
+      .post(
         "https://tesarrec.firebaseio.com/eqns/" +
           this.props.userId +
-          "/" +
-          this.state.selectedModelId +
-          "/.json?auth=" +
+          ".json?auth=" +
           this.props.token,
-        {
-          method: "PATCH",
-          headers: {
-            Accept: "application/json, text/plain, */*",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        }
+        aNewModel
       )
-        .then((response) => response.json())
-        .then((data) => {
-          if (!data.error) {
-            this.setState({ error: false }, () => {
-              this.getPrivateModels();
-            });
-          } else {
-            this.setState({ error: true });
-          }
-        })
-        .catch((error) => {
-          this.setState({ error: true });
+      .then((response) => {
+        this.props.enqueueSnackbar("Created new model", { variant: "success" });
+
+        this.setState({
+          error: false,
+          selectedModelId: response.data.name,
+          selectedModel: aNewModel,
+          allModelId: {
+            ...this.state.allModelId,
+            [response.data.name]: aNewModel,
+          },
         });
-    } else {
-      this.setState({ error: true });
-    }
+      })
+      .catch((error) => {
+        this.props.enqueueSnackbar("Failed to create new model", {
+          variant: "error",
+        });
+        this.setState({ error: true });
+      });
   };
 
-  publishEquation = () => {
-    const payload = { ...this.state.selectedModel, SavedBy: this.props.userId };
+  /**
+   * At this point this states selectedModel is completely up2date
+   */
+  MODEL_save = () => {
+    this.setState({ seekChildUpdates: true });
+  };
 
-    if (this.state.selectedModelId !== "") {
-      fetch(
+  MODEL_publish = () => {
+    let newModel = this.state.selectedModel;
+    if (!(newModel instanceof Model)) {
+      newModel = new Model(
+        {
+          Config: newModel.Config,
+          Eqns: newModel.Eqns,
+          Vars: newModel.Vars,
+        },
+        {
+          name: newModel.meta.name,
+          description: newModel.meta.description,
+          modelId: this.state.modelId,
+        }
+      );
+    }
+
+    const payload = {
+      ...newModel.returnConstructorObj(),
+      SavedBy: this.props.userId,
+    };
+
+    // alert("model Published");
+    this.setState({ published: false });
+
+    axios
+      .post(
         "https://tesarrec.firebaseio.com/public" +
           ".json?auth=" +
           this.props.token,
-        {
-          method: "POST",
-          headers: {
-            Accept: "application/json, text/plain, */*",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        }
+        payload
       )
-        .then((response) => response.json())
-        .then((data) => {
-          if (!data.error) {
-            this.setState({ error: false }, () => {
-              this.getPublicModels();
-            });
-          } else {
-            this.setState({ error: true });
-          }
-        })
-        .catch((error) => {
-          this.setState({ error: true });
+      .then((response) => {
+        this.props.enqueueSnackbar("Published model", {
+          variant: "success",
         });
-    } else {
-      this.setState({ error: true });
-    }
+        this.setState({
+          error: false,
+          selectedModelId: "",
+          // selectedModel: aNewModel,
+          allPublicId: {
+            ...this.state.allPublicId,
+            [response.data.name]: newModel.returnConstructorObj(),
+          },
+        });
+      })
+      .catch((error) => {
+        this.props.enqueueSnackbar("Failed to publish model", {
+          variant: "error",
+        });
+        this.setState({ error: true });
+      });
   };
 
-  onSelectModelLink = (modelId) => {
+  MODEL_onSelectLink = (modelId) => {
     //sets model id and eqns
     let allModels = { ...this.state.allModelId, ...this.state.allPublicId };
-
+    this.props.enqueueSnackbar("Opened new model", {
+      variant: "info",
+    });
     this.setState({
-      calculate: false,
       selectedModel: allModels[modelId],
       selectedModelId: modelId,
+      tabChoiceValue: 1,
     });
   };
 
-  onEditModelName = (newModelName) => {
-    // curl -X PUT -d '{ "first": "Jack", "last": "Sparrow" }' \
-    // 'https://[PROJECT_ID].firebaseio.com/users/jack/name.json'
-
-    //     curl -X PATCH -d '{"last":"Jones"}' \
-    //  'https://[PROJECT_ID].firebaseio.com/users/jack/name/.json'
-    const Name = {
-      Name: newModelName,
-      // userId:this.props.userId
-    };
-    // https://tesarrec.firebaseio.com/eqns/QXVRwu8vuHRTsLST6wMWOA9jt3b2/-MAeganGABPemhDxtCc_/Name
-
-    if (this.state.selectedModelId !== "") {
-      fetch(
-        "https://tesarrec.firebaseio.com/eqns/" +
-          this.props.userId +
-          "/" +
-          this.state.selectedModelId +
-          "/.json?auth=" +
-          this.props.token,
-        {
-          method: "PATCH",
-          headers: {
-            Accept: "application/json, text/plain, */*",
-            "Content-Type": "application/json",
-            type: "patch",
-            dataType: "json",
-          },
-
-          body: JSON.stringify(Name),
-        }
-      )
-        .then((response) => response.json())
-        .then((data) => {
-          if (!data.error) {
-            this.setState({ selectedModelId: "" });
-            this.getPrivateModels();
-            this.getPublicModels();
-          } else {
-            this.setState({ error: true });
-          }
-        })
-        .catch((error) => {
-          this.setState({ error: true });
-        });
-    } else {
-      this.setState({ error: true });
-    }
+  MODEL_onEditName = (newModelName) => {
+    this.props.enqueueSnackbar("Edited model name", {
+      variant: "success",
+    });
+    let modelObj = this.state.selectedModel;
+    modelObj.meta.name = newModelName;
+    this.setState({ selectedModel: modelObj }, () => this.MODEL_save());
   };
 
-  onRemoveModel = () => {
+  MODEL_onRemove = () => {
     let allModelId = { ...this.state.allModelId };
     delete allModelId[this.state.selectedModelId];
     let selectedModel = { ...this.state.selectedModel };
@@ -240,158 +185,245 @@ class ModelBench extends Component {
       allModelId: allModelId,
     });
 
-    fetch(
-      "https://tesarrec.firebaseio.com/eqns/" +
-        this.props.userId +
-        "/" +
-        this.state.selectedModelId +
-        ".json?auth=" +
-        this.props.token,
-      {
-        method: "delete",
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          "Content-Type": "application/json",
-        },
-      }
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        if (!data.error) {
-          this.setState({ error: false });
-        } else {
-          this.setState({ error: true });
-        }
+    axios
+      .delete(
+        "https://tesarrec.firebaseio.com/eqns/" +
+          this.props.userId +
+          "/" +
+          this.state.selectedModelId +
+          ".json?auth=" +
+          this.props.token
+      )
+      .then((res) => {
+        this.props.enqueueSnackbar("Deleted model", {
+          variant: "success",
+        });
+        this.setState({ error: false });
       })
-      .catch((error) => {
+      .catch((err) => {
+        this.props.enqueueSnackbar("Failed to delete model", {
+          variant: "error",
+        });
         this.setState({ error: true });
       });
   };
 
-  getPublicModels = () => {
-    const queryParams = "?auth=" + this.props.token; //+'&orderBy="userId"&equalTo="'+this.props.userId+'"'
-    fetch("https://tesarrec.firebaseio.com/public.json" + queryParams, {
-      method: "get",
-      headers: {
-        Accept: "application/json, text/plain, */*",
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (!data.error) {
-          this.setState({ allPublicId: data, error: false, loading: false });
-        } else {
-          this.setState({ error: true });
-        }
-      })
-      .catch((error) => {
+  MODEL_getPublic = () => {
+    axios
+      .get(
+        "https://tesarrec.firebaseio.com/public.json" +
+          "?auth=" +
+          this.props.token
+      )
+      .then((res) =>
+        this.setState({ allPublicId: res.data, error: false, loading: false })
+      )
+      .catch((err) => {
         this.setState({ error: true });
       });
   };
 
-  getPrivateModels = () => {
-    const queryParams = "?auth=" + this.props.token; //+'&orderBy="userId"&equalTo="'+this.props.userId+'"'
-    fetch(
-      "https://tesarrec.firebaseio.com/eqns/" +
-        this.props.userId +
-        ".json" +
-        queryParams,
-      {
-        method: "get",
-        headers: {
-          Accept: "application/json, text/plain, */*",
-          "Content-Type": "application/json",
-        },
-      }
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        if (!data.error) {
-          this.setState({ allModelId: data, error: false, loading: false });
-        } else {
-          this.setState({ error: true });
-        }
-      })
-      .catch((error) => {
+  MODEL_getPrivate = () => {
+    // const queryParams = "?auth=" + this.props.token; //+'&orderBy="userId"&equalTo="'+this.props.userId+'"'
+
+    axios
+      .get(
+        "https://tesarrec.firebaseio.com/eqns/" +
+          this.props.userId +
+          ".json" +
+          "?auth=" +
+          this.props.token
+      )
+      .then((res) =>
+        this.setState({ allModelId: res.data, error: false, loading: false })
+      )
+      .catch((err) => {
         this.setState({ error: true });
       });
   };
 
-  copyAllEqnsText = () => {
-    var allTextEqns = [];
+  EQNS_copyAllText = () => {
+    let allTextEqns = [];
 
     for (let i = 0; i < this.state.selectedModel.Eqns.length; i++) {
       let Eqn = {
         ...this.state.selectedModel.Eqns[i],
       };
-      allTextEqns.push(Eqn.TextEqn);
+      allTextEqns.push(Eqn.textEqn);
     }
     navigator.clipboard.writeText(allTextEqns);
+    this.props.enqueueSnackbar("Copied equations", {
+      variant: "success",
+    });
   };
   //        <TemplateController/>
+
+  /**
+   * This is used by child components to keep this parent informed of changes
+   * Therefore we must merge itemwise because its possible that
+   * further changes to the model has happened in this class
+   */
+  sendToParent = (modelObj) => {
+    // At the moment only the name can be out of sync here
+    modelObj.meta.name = this.state.selectedModel.meta.name;
+
+    this.setState({ selectedModel: modelObj }, () => {
+      let payload = this.state.selectedModel.returnConstructorObj();
+      if (this.state.selectedModelId !== "") {
+        // axios.put(
+        //   "https://tesarrec.firebaseio.com/eqns/" +
+        //     this.props.userId +
+        //     "/" +
+        //     this.state.selectedModelId +
+        //     "/.json?auth=",
+        //   payload
+        // )
+        // .then((response) => {
+        //   this.setState({
+        //     error: false,
+        //     seekChildUpdates: false,
+
+        //   });
+        // })
+        // .catch((error) => {
+        //   this.setState({ error: true });
+        // });
+        this.generalDBRequest(
+          payload,
+          "https://tesarrec.firebaseio.com/eqns/" +
+            this.props.userId +
+            "/" +
+            this.state.selectedModelId +
+            "/.json?auth=" +
+            this.props.token,
+          "PUT",
+          this.setState({ error: false, seekChildUpdates: false }, () => {
+            this.MODEL_getPrivate();
+            // this.props.enqueueSnackbar("Saved Model", {
+            //   variant: 'success'
+            // });
+          })
+        );
+      } else {
+        this.props.enqueueSnackbar("Failed to save model", {
+          variant: "error",
+        });
+        this.setState({ error: true });
+      }
+    });
+  };
+
   handleTabChange = (event, val) => {
+    this.props.enqueueSnackbar("Switched mode", {
+      variant: "info",
+    });
     this.setState({ tabChoiceValue: val });
   };
 
+  /** Get all mehod names aligned */
+
+  newModel() {
+    return new Model();
+  }
+
   render() {
-    let modelLinks = null;
+    let modelLinks;
     Object.keys(this.state.allModelId + this.state.allPublicId).length !== 0
       ? (modelLinks = (
-          <FileController
+          <ModelExplorer
             allModelId={this.state.allModelId}
             allPublicId={this.state.allPublicId}
             selectedModelId={this.state.selectedModelId}
-            onSelectModelLink={this.onSelectModelLink}
-            onRemoveModel={this.onRemoveModel}
-            onEditModelName={this.onEditModelName}
-            saveEquation={this.saveEquation}
-            publishEquation={this.publishEquation}
-            copyAllEqnsText={this.copyAllEqnsText}
-            createNewFile={this.createNewFile}
+            onSelectModelLink={this.MODEL_onSelectLink}
+            onRemoveModel={this.MODEL_onRemove}
+            onEditModelName={this.MODEL_onEditName}
+            saveEquation={this.MODEL_save}
+            publishEquation={() => {
+              this.setState({ published: true });
+            }}
+            copyAllEqnsText={this.EQNS_copyAllText}
+            createNewFile={this.MODEL_createNew}
+            handleTabChange={this.handleTabChange}
+            tabChoiceValue={this.state.tabChoiceValue}
           />
         ))
       : (modelLinks = null);
 
     const nodeRef = React.createRef(null);
-
+    const notistackRef = React.createRef();
+    const onClickDismiss = (key) => () => {
+      notistackRef.current.closeSnackbar(key);
+    };
     return (
       // can u inject a background-color: ranmdom lookup color if DEVMODE=TRUE
 
-      <div className={classes.ModelBenchContainer}>
-        <div ref={nodeRef} className={classes.ModelBenchItemLeft}>
-          <div className={classes.ModelBenchItemLeftFileNav}>
-            {this.state.loading ? <Skeleton /> : null}
+      <FullScreenWrapper>
+        <div className={classes.ModelBenchContainer}>
+          <div ref={nodeRef} className={classes.ModelBenchItemLeft}>
+            {/* {this.state.loading ? <Skeleton /> : null} */}
             {modelLinks}
-          </div>
 
-          <div className={classes.ModelBenchItemLeftEqnNav}>
+            {/* <div className={classes.ModelBenchItemLeftEqnNav}>
             <MyTabs
               value={this.state.tabChoiceValue}
               handleChange={this.handleTabChange}
-              labels={["Single ODE", "Coupled ODE"]}
+              labels={["Single ODE", "Coupled ODE", "Solver Analysis"]}
             />
+          </div> */}
+          </div>
+
+          <div className={classes.ModelBenchItemCenter}>
+            {/* <MathQuillTest/> */}
+            {/* {this.state.tabChoiceValue === 0 ? <SingleODE /> : null} */}
+            {this.state.tabChoiceValue === 1 ? (
+              // <SnackbarProvider
+              //   maxSnack={2}
+              //   ref={notistackRef}
+              //   action={(key) => (
+              //     <Button onClick={onClickDismiss(key)}>Dismiss</Button>
+              //   )}
+              //   preventDuplicate
+              // >
+              
+                <LinearCoupled
+                  modelId={this.state.selectedModelId}
+                  modelObj={this.state.selectedModel}
+                  sendToParent={this.sendToParent}
+                  seekChildUpdates={this.state.seekChildUpdates}
+                  enqueueSnackbar={this.props.enqueueSnackbar}
+                />
+              // </SnackbarProvider>
+            ) : null}
+            {this.state.tabChoiceValue === 2 ? <SolverAnalysis /> : null}
+            {this.state.published ? (
+              <PublishedDialog
+                onCancelPublish={() => {
+                  this.setState({ published: false });
+                }}
+                onPublishModel={this.MODEL_publish}
+              />
+            ) : null}
+          </div>
+          {this.state.error ? <SnackbarError /> : null}
+          <div className={classes.copyright}>
+            <p>
+              For the Model Bench User, <br />
+              you must give appropriate credit: ©Sohum Sen <br />
+              <a
+                href="https://tesarrec.org/modelbench"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                https://tesarrec.org/modelbench
+                <br />
+              </a>
+              01/05/2020
+            </p>
           </div>
         </div>
-
-        <div className={classes.ModelBenchItemCenter}>
-          {this.state.tabChoiceValue === 0 ? (
-            <SingleODE />
-          ) : (
-            <LinearCoupled
-              calculate={this.state.calculate}
-              modelId={this.state.selectedModelId}
-              Eqns={this.state.selectedModel.Eqns}
-              Vars={this.state.selectedModel.Vars}
-              sendToParent={this.sendToParent}
-         
-            />
-          )}
-        </div>
-        {this.state.error ? <MyErrorMessage /> : null}
-      </div>
+      </FullScreenWrapper>
     );
   }
 }
 
-export default ModelBench;
+export default withSnackbar(ModelBench);

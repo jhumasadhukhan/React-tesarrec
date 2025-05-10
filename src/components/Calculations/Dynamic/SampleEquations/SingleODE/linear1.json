@@ -1,0 +1,14 @@
+{
+  "vars": [
+    {
+     
+    }
+  ],
+  "eqns": ["1"],
+  "solved": ["t"],
+  "t0": 0,
+  "h": 0.1,
+  "numOfCycles": 10,
+  "initialConditions": [0],
+  "lineNames": ["a"]
+}
